@@ -1,22 +1,56 @@
-import logo from './logo.svg';
 import './App.css';
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useState } from 'react';
+
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
 
 function App() {
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    pic: "",
+  });
+
+  const googleLogin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        setData({
+          name: result.user.displayName,
+          email: result.user.email,
+          pic: result.user.photoURL,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <img src={data.pic} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          {data.name}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>
+          {data.email}
+        </p>
+        <button onClick={googleLogin}>
+        Sign in with Google
+      </button>
       </header>
     </div>
   );
